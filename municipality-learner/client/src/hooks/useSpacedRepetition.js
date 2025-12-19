@@ -17,16 +17,20 @@ export function useSpacedRepetition() {
 
   /**
    * Fetch the next question from the API
+   * @param {number|null} countryId - Filter by country
+   * @param {string|null} exerciseType - 'text_to_country' or 'audio_to_text_country'
    */
-  const fetchQuestion = useCallback(async (countryId = null) => {
+  const fetchQuestion = useCallback(async (countryId = null, exerciseType = null) => {
     setLoading(true);
     setError(null);
     setFeedback(null);
 
     try {
-      const url = countryId
-        ? `${API_BASE}/question?countryId=${countryId}`
-        : `${API_BASE}/question`;
+      const params = new URLSearchParams();
+      if (countryId) params.append('countryId', countryId);
+      if (exerciseType) params.append('exerciseType', exerciseType);
+      const queryString = params.toString();
+      const url = queryString ? `${API_BASE}/question?${queryString}` : `${API_BASE}/question`;
 
       const response = await fetch(url);
 
@@ -94,9 +98,9 @@ export function useSpacedRepetition() {
   /**
    * Move to the next question after feedback
    */
-  const nextQuestion = useCallback((countryId = null) => {
+  const nextQuestion = useCallback((countryId = null, exerciseType = null) => {
     setFeedback(null);
-    fetchQuestion(countryId);
+    fetchQuestion(countryId, exerciseType);
   }, [fetchQuestion]);
 
   /**

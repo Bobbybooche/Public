@@ -10,8 +10,11 @@ const sr = require('../models/spacedRepetition');
  */
 router.get('/question', async (req, res) => {
   try {
-    const { countryId } = req.query;
-    const question = await sr.getNextQuestion(countryId ? parseInt(countryId) : null);
+    const { countryId, exerciseType } = req.query;
+    const question = await sr.getNextQuestion(
+      countryId ? parseInt(countryId) : null,
+      exerciseType || null
+    );
 
     if (!question) {
       return res.status(404).json({

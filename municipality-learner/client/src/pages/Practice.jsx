@@ -11,6 +11,8 @@ import CountrySelector from '../components/CountrySelector';
 function Practice() {
   const [selectedCountry, setSelectedCountry] = useState(null);
   const [showCountrySelector, setShowCountrySelector] = useState(false);
+  // Default to 'text_to_country' since there's only Slovenia for now
+  const [exerciseType, setExerciseType] = useState('text_to_country');
 
   const {
     question,
@@ -28,14 +30,20 @@ function Practice() {
   // Fetch initial data
   useEffect(() => {
     fetchAll();
-    fetchQuestion(selectedCountry);
+    fetchQuestion(selectedCountry, exerciseType);
   }, []);
 
   // Handle country selection
   const handleCountrySelect = (countryId) => {
     setSelectedCountry(countryId);
     setShowCountrySelector(false);
-    fetchQuestion(countryId);
+    fetchQuestion(countryId, exerciseType);
+  };
+
+  // Handle exercise type change
+  const handleExerciseTypeChange = (newType) => {
+    setExerciseType(newType);
+    fetchQuestion(selectedCountry, newType);
   };
 
   // Handle answer submission
@@ -45,11 +53,37 @@ function Practice() {
 
   // Handle next question
   const handleNext = () => {
-    nextQuestion(selectedCountry);
+    nextQuestion(selectedCountry, exerciseType);
   };
 
   return (
     <div className="practice">
+      {/* Exercise Type Selector */}
+      <div className="card" style={{
+        padding: 'var(--spacing-md)',
+        marginBottom: 'var(--spacing-md)'
+      }}>
+        <div style={{ marginBottom: 'var(--spacing-sm)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-secondary)' }}>
+          Exercise Type
+        </div>
+        <div style={{ display: 'flex', gap: 'var(--spacing-sm)' }}>
+          <button
+            className={`btn ${exerciseType === 'text_to_country' ? 'btn--primary' : 'btn--secondary'}`}
+            style={{ flex: 1, padding: 'var(--spacing-sm)' }}
+            onClick={() => handleExerciseTypeChange('text_to_country')}
+          >
+            Name the Country
+          </button>
+          <button
+            className={`btn ${exerciseType === 'audio_to_text_country' ? 'btn--primary' : 'btn--secondary'}`}
+            style={{ flex: 1, padding: 'var(--spacing-sm)' }}
+            onClick={() => handleExerciseTypeChange('audio_to_text_country')}
+          >
+            Listen & Spell
+          </button>
+        </div>
+      </div>
+
       {/* Session Stats Bar */}
       <div className="card" style={{
         padding: 'var(--spacing-sm) var(--spacing-md)',

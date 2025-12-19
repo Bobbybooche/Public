@@ -51,8 +51,10 @@ function calculateInterval(currentInterval, easeFactor, isCorrect) {
  * 1. Items due for review (next_review <= now)
  * 2. Items never seen
  * 3. Items with lower ease factor (harder items)
+ * @param {number|null} countryId - Filter by country
+ * @param {string|null} exerciseType - 'text_to_country' or 'audio_to_text_country' or null for random
  */
-async function getNextQuestion(countryId = null) {
+async function getNextQuestion(countryId = null, exerciseType = null) {
   let query = `
     SELECT
       m.id,
@@ -100,9 +102,14 @@ async function getNextQuestion(countryId = null) {
 
   const row = result.rows[0];
 
-  // Randomly determine question type (50/50 text or audio if audio exists)
+  // Determine question type based on parameter or default to text_to_country
   let questionType = 'text_to_country';
-  if (row.audio_file && Math.random() > 0.5) {
+  if (exerciseType === 'audio_to_text_country' && row.audio_file) {
+    questionType = 'audio_to_text_country';
+  } else if (exerciseType === 'text_to_country') {
+    questionType = 'text_to_country';
+  } else if (!exerciseType && row.audio_file && Math.random() > 0.5) {
+    // Random selection only if no exerciseType specified (legacy behavior)
     questionType = 'audio_to_text_country';
   }
 
