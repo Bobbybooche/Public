@@ -1,0 +1,3 @@
+# This directory stores MP3 pronunciation files for municipalities
+# Files should be named: {country-code}-{municipality-name}.mp3
+# Example: si-ljubljana.mp3

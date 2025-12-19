@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:15-alpine
+    container_name: municipality-learner-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: municipality_learner
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./server/db/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./server/db/seed-slovenia.sql:/docker-entrypoint-initdb.d/02-seed-slovenia.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U user -d municipality_learner"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Backend API Server
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: municipality-learner-server
+    restart: unless-stopped
+    environment:
+      DATABASE_URL: postgresql://user:password@db:5432/municipality_learner
+      PORT: 3001
+      NODE_ENV: production
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./public/audio:/app/public/audio:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Frontend (built and served by nginx)
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: municipality-learner-client
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - server
+
+volumes:
+  postgres_data:
