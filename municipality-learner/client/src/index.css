@@ -216,12 +216,35 @@ body {
 }
 
 .audio-button--playing {
-  background: var(--color-secondary);
+  background: var(--color-success);
+  transform: scale(1.05);
+}
+
+.audio-button--replay {
+  background: var(--color-primary);
+  box-shadow: var(--shadow-lg);
+}
+
+.audio-button--disabled {
+  width: 64px;
+  height: 64px;
+  opacity: 0.4;
+  cursor: not-allowed;
+  background: var(--color-text-secondary);
+}
+
+.audio-button--error {
+  width: 64px;
+  height: 64px;
+  background: var(--color-error);
+  font-size: var(--font-size-xl);
+  font-weight: bold;
 }
 
 .audio-hint {
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
+  text-align: center;
 }
 
 /* Answer Input */
